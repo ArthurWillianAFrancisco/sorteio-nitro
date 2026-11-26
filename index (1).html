@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sorteio Especial — Discord Nitro</title>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=v1DLAEphmxy2f2ScxWaiLC-ku2ugQX1c7lLBIXCYnCRZetWIGuPTmEWY3S4F1YOh1RmMTThCis8V6u4r8RUm0vlIY2Hm8CnXAOKTx7ZIrUC2G2F_tReuzN5OcdyCOT60a865D-Qg_MJ0WgT8ZbdaZe3PwIn6P7NEFrxJDi3B5xYgj0ZVuZCtXiTe6jV9s-7PlQEeopn1EsPe_lJUMds_X4Fa6DmGZds34CpxPUlHXzD1c1-4tlxS_S7c9u62vcy-XZupX6590hXQVgVvSlYAy3euGR6dSigQFJuSE3kR1-ZlwLQtwjjQ_H30IX1uARmz" charset="UTF-8"></script><link rel="stylesheet" crossorigin="anonymous" href="https://gc.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9jb250cmlidXRpb24udXNlcmNvbnRlbnQuZ29vZ2xlLmNvbS9kb3dubG9hZD9jPUNneGlZWEprWDNOMGIzSmhaMlVTVUJJTmNtVnpjRzl1YzJWZlpHRjBZUm9fQ2pBelptUTBNRE0zWlRVNFlqSTVaR0k1TURBd05qWXhNak0wTXpsaFpUSTVPVEE0T0RRNFpqTTNNMk15TkdZM1pqZ1NDeElIRUk3MGo1ZmtHUmdCJmZpbGVuYW1lPWluZGV4Lmh0bWwmb3BpPTEwMzEzNTA1MA"/><style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body {
+      margin: 0; min-height: 100vh; background: #0b1120; color: #f8fafc;
+      display: flex; flex-direction: column; overflow-x: hidden;
+    }
+
+    /* ================= VIEW ALUNO (CELULAR) ================= */
+    #view-aluno {
+      display: none; flex: 1; align-items: center; justify-content: center;
+      background: radial-gradient(circle at top, #312e81 0%, #0b1120 72%);
+      padding: 18px;
+    }
+    .card {
+      width: 100%; max-width: 420px; background: #131c31;
+      border: 1.5px solid #5865F2; border-radius: 20px; padding: 28px 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55); text-align: center;
+    }
+    .badge {
+      display: inline-block; background: linear-gradient(90deg, #5865F2, #a855f7);
+      color: #fff; font-size: 12px; font-weight: 800; letter-spacing: 1px;
+      padding: 6px 14px; border-radius: 999px; margin-bottom: 14px;
+    }
+    .card h1 { margin: 4px 0 8px; font-size: 26px; line-height: 1.2; }
+    .card p.sub { color: #cbd5e1; font-size: 14.5px; margin: 0 0 22px; line-height: 1.45; }
+    .card label { display: block; text-align: left; font-size: 13px; color: #94a3b8; margin: 12px 0 6px; font-weight: 600; }
+    .card input, .card select {
+      width: 100%; padding: 13px 14px; border-radius: 12px; border: 1.5px solid #273654;
+      background: #070b14; color: #f8fafc; font-size: 15px; outline: none;
+    }
+    .card input:focus, .card select:focus { border-color: #00e5ff; }
+    .card button {
+      width: 100%; margin-top: 20px; padding: 14px; border: none; border-radius: 12px;
+      background: linear-gradient(90deg, #5865F2, #00e5ff); color: #070b14;
+      font-size: 16px; font-weight: 800; cursor: pointer; transition: transform .15s;
+    }
+    .card button:active { transform: scale(0.98); }
+    .card button:disabled { opacity: 0.65; cursor: wait; }
+    .ok-box { display: none; padding: 12px 4px; }
+    .ok-icon { font-size: 54px; margin-bottom: 8px; }
+    .note { margin-top: 16px; font-size: 12px; color: #64748b; }
+
+    /* ================= VIEW TELÃO (PROJETOR) ================= */
+    #view-telao {
+      display: none; flex: 1; flex-direction: column; position: relative;
+    }
+    .topbar { height: 6px; background: linear-gradient(90deg, #5865F2, #00e5ff, #a855f7); transition: background 0.3s; }
+    .topbar.alert-mode { background: linear-gradient(90deg, #f43f5e, #f59e0b, #f43f5e); }
+
+    .secret-corner {
+      position: fixed; top: 0; right: 0; width: 48px; height: 48px; z-index: 40; cursor: default;
+    }
+
+    .container {
+      flex: 1; max-width: 1240px; width: 100%; margin: 0 auto; padding: 30px 36px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+
+    .local-warn {
+      display: none; background: rgba(245, 158, 11, 0.14); border: 1.5px solid #f59e0b;
+      color: #fde68a; padding: 10px 16px; border-radius: 10px; font-size: 13.5px; margin-bottom: 18px;
+    }
+
+    /* MODO 1: SORTEIO 100% DISFARÇADO */
+    #modo-sorteio {
+      display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 44px; align-items: center;
+      margin: auto 0;
+    }
+    .pill {
+      display: inline-block; padding: 8px 18px; border-radius: 999px; font-weight: 800;
+      font-size: 13px; letter-spacing: 1px; background: linear-gradient(90deg, #5865F2, #a855f7); color: #fff;
+    }
+    .hero-title { font-size: 54px; line-height: 1.06; margin: 20px 0 16px; font-weight: 900; }
+    .hero-title span { color: #00e5ff; }
+    .hero-sub { font-size: 21px; color: #cbd5e1; line-height: 1.45; margin-bottom: 28px; max-width: 560px; }
+
+    .action-row { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+    .counter-box {
+      display: inline-flex; align-items: center; gap: 16px; background: #131c31;
+      border: 2px solid #5865F2; border-radius: 18px; padding: 14px 24px;
+      position: relative; transition: transform 0.2s, border-color 0.2s;
+    }
+    .counter-box.pulse { transform: scale(1.06); border-color: #10b981; }
+    .counter-num { font-size: 44px; font-weight: 900; color: #00e5ff; font-family: Consolas, monospace; min-width: 34px; text-align: center; }
+    .counter-lbl { font-size: 16px; color: #e2e8f0; font-weight: 600; line-height: 1.3; }
+
+    .join-toast {
+      position: absolute; top: -14px; right: 14px; background: #10b981; color: #070b14;
+      font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px;
+      opacity: 0; transform: translateY(6px); transition: all 0.25s; pointer-events: none;
+    }
+    .join-toast.show { opacity: 1; transform: translateY(0); }
+
+    .btn-raffle {
+      padding: 18px 28px; border-radius: 16px; border: none; cursor: pointer;
+      background: linear-gradient(90deg, #10b981, #00e5ff); color: #070b14;
+      font-size: 18px; font-weight: 900; letter-spacing: 0.4px;
+      box-shadow: 0 12px 30px rgba(0, 229, 255, 0.22); transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-raffle:hover { transform: translateY(-2px); box-shadow: 0 16px 36px rgba(0, 229, 255, 0.34); }
+    .btn-raffle:active { transform: scale(0.98); }
+
+    .qr-card {
+      background: #131c31; border: 2px solid #5865F2; border-radius: 26px;
+      padding: 30px; text-align: center; box-shadow: 0 24px 64px rgba(88, 101, 242, 0.22);
+    }
+    .qr-wrap {
+      background: #ffffff; padding: 18px; border-radius: 18px; display: inline-flex;
+      align-items: center; justify-content: center; margin-bottom: 16px;
+    }
+    #qr-canvas { display: block; width: 300px; height: 300px; image-rendering: pixelated; }
+    .qr-caption { font-size: 17px; font-weight: 700; color: #f8fafc; }
+    .qr-sub { font-size: 13.5px; color: #94a3b8; margin-top: 4px; }
+
+    /* OVERLAY DE SUSPENSE DA ROLETA */
+    #overlay-roleta {
+      display: none; position: fixed; inset: 0; background: rgba(11, 17, 32, 0.96);
+      z-index: 60; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+      padding: 24px;
+    }
+    .roleta-label { font-size: 20px; color: #00e5ff; font-weight: 800; letter-spacing: 2px; margin-bottom: 18px; }
+    .roleta-name {
+      font-size: 62px; font-weight: 900; color: #f8fafc; padding: 24px 48px;
+      background: #131c31; border: 3px solid #5865F2; border-radius: 24px;
+      min-width: 460px; max-width: 90vw; box-shadow: 0 0 60px rgba(88, 101, 242, 0.45);
+    }
+
+    /* MODO 2: REVELAÇÃO (SÓ APARECE QUANDO VOCÊ ATIVAR) */
+    #modo-revelacao { display: none; flex-direction: column; gap: 16px; width: 100%; }
+    .alert-banner {
+      background: rgba(244, 63, 94, 0.14); border: 2px solid #f43f5e;
+      border-radius: 16px; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .alert-banner h2 { margin: 0; font-size: 27px; color: #f43f5e; }
+    .alert-banner p { margin: 6px 0 0; font-size: 16px; color: #f8fafc; }
+
+    .terminal {
+      background: #070b14; border: 1.5px solid #273654; border-radius: 16px;
+      overflow: hidden; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+    }
+    .term-head {
+      background: #1a253f; padding: 10px 18px; font-family: Consolas, monospace;
+      font-size: 13px; color: #f43f5e; font-weight: 700; display: flex; justify-content: space-between;
+    }
+    table { width: 100%; border-collapse: collapse; font-family: Consolas, monospace; font-size: 14.5px; }
+    th { text-align: left; padding: 12px 14px; color: #94a3b8; border-bottom: 1px solid #1e293b; font-size: 12.5px; }
+    td { padding: 11px 14px; border-bottom: 1px solid #131c31; color: #e2e8f0; }
+    td.nome { color: #00e5ff; font-weight: 700; font-size: 16px; }
+    td.disp { color: #f59e0b; }
+    .table-scroll { max-height: 360px; overflow-y: auto; }
+    .impact-footer {
+      background: #131c31; border-left: 5px solid #f59e0b; border-radius: 12px;
+      padding: 14px 20px; font-size: 16.5px; color: #f8fafc; font-weight: 600;
+    }
+    .winner-box {
+      display: none; background: rgba(16, 185, 129, 0.16); border: 2px solid #10b981;
+      border-radius: 14px; padding: 14px 20px; font-size: 19px; font-weight: 800; color: #10b981;
+      text-align: center;
+    }
+    .reveal-controls {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-top: 4px;
+    }
+    .btn {
+      padding: 10px 16px; border-radius: 10px; border: none; font-weight: 700;
+      font-size: 14px; cursor: pointer;
+    }
+    .btn-green { background: #10b981; color: #0b1120; }
+    .btn-ghost { background: #1a253f; color: #cbd5e1; border: 1px solid #273654; }
+
+    /* BARRA SECRETA DO APRESENTADOR (SÓ APARECE APERTANDO TECLA 'H') */
+    #hud-secreto {
+      display: none; position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(7, 11, 20, 0.94); border: 1px solid #334155; border-radius: 12px;
+      padding: 10px 18px; font-family: Consolas, monospace; font-size: 12.5px; color: #cbd5e1;
+      z-index: 80; gap: 16px; align-items: center; flex-wrap: wrap; box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+    }
+    #hud-secreto kbd {
+      background: #1e293b; color: #00e5ff; padding: 2px 7px; border-radius: 5px; font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      #modo-sorteio { grid-template-columns: 1fr; text-align: center; }
+      .action-row { justify-content: center; }
+      .hero-title { font-size: 38px; }
+      .roleta-name { font-size: 36px; min-width: 280px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== TELA DO ALUNO (CELULAR) ==================== -->
+  <div id="view-aluno">
+    <div class="card">
+      <div id="form-area">
+        <div class="badge">🎁 SORTEIO AO VIVO</div>
+        <h1>Discord Nitro Liberado!</h1>
+        <p class="sub">Coloque seu <strong>primeiro nome ou apelido</strong> para entrar na roleta do sorteio de hoje.</p>
+        <form id="form-sorteio">
+          <label for="nome">Seu nome ou apelido</label>
+          <input id="nome" name="nome" type="text" maxlength="40" placeholder="Ex: Lucas, Bia, GamerBR..." required autocomplete="off" />
+
+          <label for="premio">Se ganhar, qual prêmio você prefere?</label>
+          <select id="premio" name="premio">
+            <option value="Discord Nitro (1 Ano)">Discord Nitro (1 Ano)</option>
+            <option value="10.000 Robux">10.000 Robux</option>
+            <option value="Gift Card Steam / Play">Gift Card Steam / Play</option>
+          </select>
+
+          <button type="submit" id="btn-enviar">QUERO PARTICIPAR!</button>
+        </form>
+        <div class="note">Válido apenas durante o evento de hoje.</div>
+      </div>
+
+      <div id="ok-area" class="ok-box">
+        <div class="ok-icon">🎟️</div>
+        <h1 style="color:#10b981;">Inscrição Confirmada!</h1>
+        <p class="sub" id="ok-msg">Seu nome já entrou na roleta. Agora fique de olho no telão!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TELA DO TELÃO (PROJETOR) ==================== -->
+  <div id="view-telao">
+    <div id="topbar" class="topbar"></div>
+    <div class="secret-corner" id="secret-corner" title=""></div>
+
+    <div class="container">
+      <div id="local-warn" class="local-warn">
+        ⚠️ Arquivo aberto localmente (<code>file://</code>). Para funcionar no celular da plateia, publique este <code>index.html</code> no <strong>GitHub Pages</strong> ou <strong>Netlify Drop</strong>. Aperte <strong>T</strong> para testar uma entrada agora ou <strong>H</strong> para ver os atalhos secretos.
+      </div>
+
+      <!-- MODO 1: SORTEIO LEGÍTIMO (ZERO SPOILER!) -->
+      <div id="modo-sorteio">
+        <div>
+          <span class="pill">🎁 CONCURSO RELÂMPAGO</span>
+          <h1 class="hero-title">SORTEIO:<br/><span>DISCORD NITRO</span><br/>LIBERADO!</h1>
+          <p class="hero-sub">Aponte a câmera do celular para o QR Code, coloque seu nome e concorra agora ao vivo na roleta.</p>
+
+          <div class="action-row">
+            <div class="counter-box" id="counter-box">
+              <div class="join-toast" id="join-toast">+1 entrou!</div>
+              <div class="counter-num" id="contador">0</div>
+              <div class="counter-lbl">participantes<br/>na roleta</div>
+            </div>
+            <button class="btn-raffle" id="btn-sortear-dramatico" onclick="iniciarSuspenseERevelar()">🎲 REALIZAR SORTEIO</button>
+          </div>
+        </div>
+
+        <div class="qr-card">
+          <div class="qr-wrap">
+            <canvas id="qr-canvas" width="300" height="300"></canvas>
+          </div>
+          <div class="qr-caption">Escaneie com a câmera do celular</div>
+          <div class="qr-sub">Válido apenas durante o evento de hoje</div>
+        </div>
+      </div>
+
+      <!-- MODO 2: REVELAÇÃO (OCULTO ATÉ O MOMENTO CERTO) -->
+      <div id="modo-revelacao">
+        <div class="alert-banner">
+          <div>
+            <h2>⚠️ CALMA! NÃO TEM NITRO — VOCÊ CAIU NUMA SIMULAÇÃO!</h2>
+            <p>Olha quantas pessoas escanearam um QR Code desconhecido e entregaram dados em segundos:</p>
+          </div>
+          <div class="counter-num" id="contador-ataque" style="color:#f43f5e;">0</div>
+        </div>
+
+        <div id="winner-box" class="winner-box"></div>
+
+        <div class="terminal">
+          <div class="term-head">
+            <span>● ● ●   PAINEL DO ATACANTE (SIMULAÇÃO EDUCATIVA — AO VIVO)</span>
+            <span>DADOS RECEBIDOS EM TEMPO REAL</span>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>NOME / APELIDO</th>
+                  <th>ISCA ESCOLHIDA</th>
+                  <th>DISPOSITIVO</th>
+                  <th>NAVEGADOR</th>
+                  <th>TELA</th>
+                  <th>HORA</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-corpo"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="impact-footer">
+          💡 Hoje eu só pedi o seu nome de brincadeira. Num golpe real ("Nitro grátis", "Vote em mim no concurso"), essa mesma tela teria a sua senha e o acesso completo à sua conta.
+        </div>
+
+        <div class="reveal-controls">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-ghost" onclick="mostrarTelaSorteio()">⬅ Voltar ao QR Code</button>
+            <button class="btn btn-green" onclick="sortearNomeReal()">🎲 Sortear 1 Nome</button>
+            <button class="btn btn-ghost" onclick="novaSala()">🔄 Nova Sala / Zerar</button>
+          </div>
+          <span style="font-family:Consolas,monospace; font-size:12px; color:#64748b;">Tecla [H] para diagnóstico de conexão</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OVERLAY DA ROLETA DE SUSPENSE -->
+    <div id="overlay-roleta">
+      <div class="roleta-label">🎲 SORTEANDO GANHADOR...</div>
+      <div class="roleta-name" id="roleta-nome">...</div>
+    </div>
+
+    <!-- HUD SECRETO DO APRESENTADOR (INVISÍVEL — APERTE 'H' PARA VER) -->
+    <div id="hud-secreto">
+      <span id="hud-status">🟡 Conectando...</span>
+      <span>|</span>
+      <span><kbd>Enter</kbd> Roleta + Revelar</span>
+      <span><kbd>R</kbd> Revelar direto</span>
+      <span><kbd>T</kbd> +1 Teste</span>
+      <span><kbd>L</kbd> Zerar/Nova sala</span>
+      <span><kbd>H</kbd> Ocultar</span>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. GERADOR DE QR CODE 100% LOCAL (ISO/IEC 18004, Versões 1..10, Nível L)
+    //    Zero requisições externas -> renderiza instantaneamente em < 2ms!
+    // =========================================================================
+    const QR_VER_L = {
+      1:  [26,   7, 1,  19, 0,  0, []],
+      2:  [44,  10, 1,  34, 0,  0, [6, 18]],
+      3:  [70,  15, 1,  55, 0,  0, [6, 22]],
+      4:  [100, 20, 1,  80, 0,  0, [6, 26]],
+      5:  [134, 26, 1, 108, 0,  0, [6, 30]],
+      6:  [172, 18, 2,  68, 0,  0, [6, 34]],
+      7:  [196, 20, 2,  78, 0,  0, [6, 22, 38]],
+      8:  [242, 24, 2,  97, 0,  0, [6, 24, 42]],
+      9:  [292, 30, 2, 116, 0,  0, [6, 26, 46]],
+      10: [346, 18, 2,  68, 2, 69, [6, 28, 50]]
+    };
+
+    const GF_EXP = new Uint8Array(512);
+    const GF_LOG = new Uint8Array(256);
+    (function initGF() {
+      let x = 1;
+      for (let i = 0; i < 255; i++) {
+        GF_EXP[i] = x; GF_LOG[x] = i;
+        x <<= 1; if (x & 0x100) x ^= 0x11d;
+      }
+      for (let i = 255; i < 512; i++) GF_EXP[i] = GF_EXP[i - 255];
+    })();
+
+    function gfMul(a, b) { return (a === 0 || b === 0) ? 0 : GF_EXP[GF_LOG[a] + GF_LOG[b]]; }
+    function rsGenPoly(deg) {
+      let poly = [1];
+      for (let i = 0; i < deg; i++) {
+        const nxt = new Array(poly.length + 1).fill(0);
+        for (let j = 0; j < poly.length; j++) {
+          nxt[j] ^= poly[j];
+          nxt[j + 1] ^= gfMul(poly[j], GF_EXP[i]);
+        }
+        poly = nxt;
+      }
+      return poly;
+    }
+    function rsEncode(data, nsym) {
+      const gen = rsGenPoly(nsym);
+      const res = data.concat(new Array(nsym).fill(0));
+      for (let i = 0; i < data.length; i++) {
+        const coef = res[i];
+        if (coef !== 0) {
+          for (let j = 1; j < gen.length; j++) res[i + j] ^= gfMul(gen[j], coef);
+        }
+      }
+      return res.slice(data.length);
+    }
+
+    function gerarMatrizQR(text) {
+      const raw = Array.from(new TextEncoder().encode(text));
+      let ver = 0;
+      for (let v = 1; v <= 10; v++) {
+        const [, , b1, d1, b2, d2] = QR_VER_L[v];
+        const cap = b1 * d1 + b2 * d2;
+        const cbits = v <= 9 ? 8 : 16;
+        if (Math.ceil((4 + cbits + raw.length * 8) / 8) <= cap) { ver = v; break; }
+      }
+      if (!ver) throw new Error('URL muito longa para QR');
+      const [, ecPer, b1, d1, b2, d2, aligns] = QR_VER_L[ver];
+      const cap = b1 * d1 + b2 * d2;
+      const cbits = ver <= 9 ? 8 : 16;
+
+      const bits = [];
+      const push = (val, n) => { for (let i = n - 1; i >= 0; i--) bits.push((val >> i) & 1); };
+      push(0b0100, 4);
+      push(raw.length, cbits);
+      for (const b of raw) push(b, 8);
+      push(0, Math.min(4, cap * 8 - bits.length));
+      while (bits.length % 8 !== 0) bits.push(0);
+
+      const dataBytes = [];
+      for (let i = 0; i < bits.length; i += 8) {
+        let v = 0; for (let j = 0; j < 8; j++) v = (v << 1) | bits[i + j];
+        dataBytes.push(v);
+      }
+      for (let p = 0; dataBytes.length < cap; p++) dataBytes.push(p % 2 === 0 ? 0xec : 0x11);
+
+      const blocks = [], ecs = [];
+      let pos = 0;
+      for (let i = 0; i < b1; i++) { const blk = dataBytes.slice(pos, pos + d1); pos += d1; blocks.push(blk); ecs.push(rsEncode(blk, ecPer)); }
+      for (let i = 0; i < b2; i++) { const blk = dataBytes.slice(pos, pos + d2); pos += d2; blocks.push(blk); ecs.push(rsEncode(blk, ecPer)); }
+
+      const codewords = [];
+      const maxD = Math.max(d1, d2);
+      for (let i = 0; i < maxD; i++) for (const blk of blocks) if (i < blk.length) codewords.push(blk[i]);
+      for (let i = 0; i < ecPer; i++) for (const ec of ecs) codewords.push(ec[i]);
+
+      const size = 17 + 4 * ver;
+      const mat = Array.from({ length: size }, () => new Uint8Array(size));
+      const isFunc = Array.from({ length: size }, () => new Uint8Array(size));
+      const setF = (r, c, v) => { if (r >= 0 && r < size && c >= 0 && c < size) { mat[r][c] = v ? 1 : 0; isFunc[r][c] = 1; } };
+
+      for (const [fr, fc] of [[0, 0], [0, size - 7], [size - 7, 0]]) {
+        for (let dr = -1; dr <= 7; dr++) for (let dc = -1; dc <= 7; dc++) {
+          const inP = dr >= 0 && dr <= 6 && dc >= 0 && dc <= 6;
+          const v = inP && (dr === 0 || dr === 6 || dc === 0 || dc === 6 || (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4));
+          setF(fr + dr, fc + dc, v);
+        }
+      }
+      for (const ar of aligns) for (const ac of aligns) {
+        if (isFunc[ar][ac]) continue;
+        for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) {
+          setF(ar + dr, ac + dc, Math.abs(dr) === 2 || Math.abs(dc) === 2 || (dr === 0 && dc === 0));
+        }
+      }
+      for (let i = 8; i < size - 8; i++) {
+        if (!isFunc[6][i]) setF(6, i, i % 2 === 0);
+        if (!isFunc[i][6]) setF(i, 6, i % 2 === 0);
+      }
+      setF(size - 8, 8, 1);
+      for (let i = 0; i < 9; i++) { if (!isFunc[8][i]) setF(8, i, 0); if (!isFunc[i][8]) setF(i, 8, 0); }
+      for (let i = 0; i < 8; i++) { setF(8, size - 1 - i, 0); setF(size - 1 - i, 8, 0); }
+
+      if (ver >= 7) {
+        let rem = ver;
+        for (let i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >> 11) * 0x1f25);
+        const vbits = (ver << 12) | rem;
+        for (let i = 0; i < 18; i++) {
+          const bit = (vbits >> i) & 1;
+          const a = size - 11 + (i % 3), b = Math.floor(i / 3);
+          setF(a, b, bit); setF(b, a, bit);
+        }
+      }
+
+      const cwBits = [];
+      for (const cw of codewords) for (let i = 7; i >= 0; i--) cwBits.push((cw >> i) & 1);
+      let bi = 0, up = true;
+      for (let col = size - 1; col > 0; col -= 2) {
+        if (col === 6) col--;
+        for (let i = 0; i < size; i++) {
+          const r = up ? (size - 1 - i) : i;
+          for (let dc = 0; dc >= -1; dc--) {
+            const c = col + dc;
+            if (!isFunc[r][c]) {
+              const bit = bi < cwBits.length ? cwBits[bi++] : 0;
+              mat[r][c] = ((r + c) % 2 === 0) ? (bit ^ 1) : bit;
+            }
+          }
+        }
+        up = !up;
+      }
+
+      const fmtData = (0b01 << 3) | 0; // ECC L + Mask 0
+      let rem = fmtData;
+      for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >> 9) * 0x537);
+      const fmtBits = ((fmtData << 10) | rem) ^ 0x5412;
+      for (let i = 0; i < 6; i++) mat[8][i] = (fmtBits >> (14 - i)) & 1;
+      mat[8][7] = (fmtBits >> 8) & 1;
+      mat[8][8] = (fmtBits >> 7) & 1;
+      mat[7][8] = (fmtBits >> 6) & 1;
+      for (let i = 9; i < 15; i++) mat[14 - i][8] = (fmtBits >> (14 - i)) & 1;
+      for (let i = 0; i < 8; i++) mat[size - 1 - i][8] = (fmtBits >> (14 - i)) & 1;
+      for (let i = 8; i < 15; i++) mat[8][size - 15 + i] = (fmtBits >> (14 - i)) & 1;
+      return mat;
+    }
+
+    function desenharQRNoCanvas(canvas, text) {
+      const mat = gerarMatrizQR(text);
+      const sz = mat.length, quiet = 4, total = sz + quiet * 2;
+      const px = Math.floor(300 / total);
+      const realSize = total * px;
+      canvas.width = realSize;
+      canvas.height = realSize;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, realSize, realSize);
+      ctx.fillStyle = '#0b1120';
+      for (let r = 0; r < sz; r++) {
+        for (let c = 0; c < sz; c++) {
+          if (mat[r][c]) ctx.fillRect((c + quiet) * px, (r + quiet) * px, px, px);
+        }
+      }
+    }
+
+    // =========================================================================
+    // 2. MINI CLIENTE MQTT 3.1.1 OVER WEBSOCKET (PURO JS, INSTANTÂNEO!)
+    // =========================================================================
+    const te = new TextEncoder(), td = new TextDecoder();
+    function mqttRemLen(x) {
+      const out = [];
+      do { let b = x % 128; x = Math.floor(x / 128); if (x > 0) b |= 0x80; out.push(b); } while (x > 0);
+      return out;
+    }
+    function mqttStr(s) {
+      const b = te.encode(s);
+      return [b.length >> 8, b.length & 0xff, ...b];
+    }
+    function pktConnect(cid) {
+      const vh = [0x00, 0x04, 0x4d, 0x51, 0x54, 0x54, 0x04, 0x02, 0x00, 0x3c];
+      const pl = mqttStr(cid);
+      return new Uint8Array([0x10, ...mqttRemLen(vh.length + pl.length), ...vh, ...pl]);
+    }
+    function pktSubscribe(pid, topic) {
+      const vh = [pid >> 8, pid & 0xff];
+      const pl = [...mqttStr(topic), 0x00];
+      return new Uint8Array([0x82, ...mqttRemLen(vh.length + pl.length), ...vh, ...pl]);
+    }
+    function pktPublish(topic, text) {
+      const vh = mqttStr(topic);
+      const pl = Array.from(te.encode(text));
+      return new Uint8Array([0x30, ...mqttRemLen(vh.length + pl.length), ...vh, ...pl]);
+    }
+
+    class FastMqttClient {
+      constructor(name, url, topic, onMessage, onState) {
+        this.name = name; this.url = url; this.topic = topic;
+        this.onMessage = onMessage; this.onState = onState;
+        this.ws = null; this.ready = false; this.closed = false; this.pingTimer = null;
+        this.connect();
+      }
+      connect() {
+        if (this.closed) return;
+        this.ready = false;
+        if (this.onState) this.onState(this.name, 'connecting');
+        try {
+          this.ws = new WebSocket(this.url, ['mqtt']);
+          this.ws.binaryType = 'arraybuffer';
+        } catch (e) {
+          if (this.onState) this.onState(this.name, 'error');
+          return;
+        }
+        this.ws.onopen = () => {
+          const cid = 'web_' + Math.random().toString(36).slice(2, 10);
+          this.ws.send(pktConnect(cid));
+        };
+        this.ws.onmessage = (ev) => {
+          const buf = new Uint8Array(ev.data);
+          let off = 0;
+          while (off < buf.length) {
+            const b0 = buf[off++], ptype = b0 >> 4;
+            let mul = 1, rlen = 0, byte;
+            do {
+              if (off >= buf.length) return;
+              byte = buf[off++]; rlen += (byte & 127) * mul; mul *= 128;
+            } while ((byte & 128) !== 0);
+            const end = off + rlen;
+            if (ptype === 2 && buf[off + 1] === 0) {
+              this.ready = true;
+              if (this.onState) this.onState(this.name, 'online');
+              if (this.onMessage) this.ws.send(pktSubscribe(1, this.topic));
+              clearInterval(this.pingTimer);
+              this.pingTimer = setInterval(() => {
+                if (this.ws && this.ws.readyState === 1) this.ws.send(new Uint8Array([0xc0, 0x00]));
+              }, 25000);
+            } else if (ptype === 3 && this.onMessage) {
+              const qos = (b0 >> 1) & 3;
+              const tlen = (buf[off] << 8) | buf[off + 1];
+              const pstart = off + 2 + tlen + (qos > 0 ? 2 : 0);
+              const txt = td.decode(buf.subarray(pstart, end));
+              this.onMessage(txt);
+            }
+            off = end;
+          }
+        };
+        this.ws.onerror = () => { this.ready = false; if (this.onState) this.onState(this.name, 'error'); };
+        this.ws.onclose = () => {
+          this.ready = false; clearInterval(this.pingTimer);
+          if (this.onState) this.onState(this.name, 'offline');
+          if (!this.closed) setTimeout(() => this.connect(), 3000);
+        };
+      }
+      publish(text) {
+        if (this.ready && this.ws && this.ws.readyState === 1) {
+          this.ws.send(pktPublish(this.topic, text));
+          return true;
+        }
+        return false;
+      }
+      close() {
+        this.closed = true; clearInterval(this.pingTimer);
+        if (this.ws) try { this.ws.close(); } catch (e) {}
+      }
+    }
+
+    const BROKERS = [
+      { name: 'EMQX', url: 'wss://broker.emqx.io:8084/mqtt' },
+      { name: 'HiveMQ', url: 'wss://broker.hivemq.com:8884/mqtt' }
+    ];
+
+    // =========================================================================
+    // 3. UTILITÁRIOS DE DETECÇÃO E ROTEAMENTO
+    // =========================================================================
+    const params = new URLSearchParams(window.location.search);
+    const salaParam = params.get('s') || params.get('sala');
+    const isAluno = Boolean(salaParam) && window.location.hash !== '#telao';
+
+    function detectarDispositivo() {
+      const ua = (navigator.userAgent || '').toLowerCase();
+      if (ua.includes('iphone')) return 'iPhone (iOS)';
+      if (ua.includes('ipad')) return 'iPad (iPadOS)';
+      if (ua.includes('android')) {
+        if (ua.includes('samsung') || ua.includes('sm-')) return 'Android (Samsung)';
+        if (ua.includes('moto ') || ua.includes('motorola')) return 'Android (Motorola)';
+        if (ua.includes('xiaomi') || ua.includes('redmi') || ua.includes('poco')) return 'Android (Xiaomi)';
+        return 'Android';
+      }
+      if (ua.includes('windows')) return 'PC (Windows)';
+      if (ua.includes('macintosh') || ua.includes('mac os')) return 'Mac (macOS)';
+      if (ua.includes('linux')) return 'PC (Linux)';
+      return 'Celular / Web';
+    }
+
+    function detectarNavegador() {
+      const ua = (navigator.userAgent || '').toLowerCase();
+      if (ua.includes('instagram')) return 'App Instagram';
+      if (ua.includes('edg/')) return 'Edge';
+      if (ua.includes('opr/') || ua.includes('opera')) return 'Opera';
+      if (ua.includes('firefox') || ua.includes('fxios')) return 'Firefox';
+      if (ua.includes('chrome') || ua.includes('crios')) return 'Chrome';
+      if (ua.includes('safari')) return 'Safari';
+      return 'Navegador Web';
+    }
+
+    function horaAtual() { return new Date().toLocaleTimeString('pt-BR', { hour12: false }); }
+
+    function gerarIdSala() {
+      const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+      let id = 'nitro-';
+      for (let i = 0; i < 8; i++) id += chars[Math.floor(Math.random() * chars.length)];
+      return id;
+    }
+
+    // =========================================================================
+    // 4. MODO ALUNO (CELULAR — PRÉ-CONEXÃO INSTANTÂNEA EM SEGUNDO PLANO)
+    // =========================================================================
+    if (isAluno) {
+      document.getElementById('view-aluno').style.display = 'flex';
+      const mqttTopic = 'sorteio/palestra/' + salaParam;
+      // Já abre conexão WebSocket enquanto o aluno digita o nome -> envio em < 50ms!
+      const clients = BROKERS.map(b => new FastMqttClient(b.name, b.url, mqttTopic, null, null));
+
+      const form = document.getElementById('form-sorteio');
+      const btn = document.getElementById('btn-enviar');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = document.getElementById('nome').value.trim().slice(0, 40);
+        const premio = document.getElementById('premio').value;
+        if (!nome) return;
+
+        btn.disabled = true;
+        btn.textContent = 'ENVIANDO...';
+
+        const payloadStr = JSON.stringify({
+          id: Math.random().toString(36).slice(2) + Date.now(),
+          nome,
+          premio,
+          dispositivo: detectarDispositivo(),
+          navegador: detectarNavegador(),
+          tela: `${window.screen.width}x${window.screen.height}`,
+          horario: horaAtual()
+        });
+
+        // 1) Dispara via todos os MQTT WebSockets já conectados (instantâneo!)
+        let enviouFast = false;
+        clients.forEach(c => { if (c.publish(payloadStr)) enviouFast = true; });
+
+        // 2) Envia também backup silencioso via Porta 443 (ntfy.sh) caso firewall bloqueie 8084/8884
+        const ntfyPromise = fetch('https://ntfy.sh/sorteio_' + encodeURIComponent(salaParam), {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+          body: payloadStr,
+          keepalive: true
+        }).catch(() => {});
+
+        // Se nenhum WebSocket estava pronto ainda, espera até 1.5s ou o ntfy terminar
+        if (!enviouFast) {
+          await Promise.race([
+            ntfyPromise,
+            new Promise(resolve => {
+              const t = setInterval(() => {
+                clients.forEach(c => { if (c.publish(payloadStr)) enviouFast = true; });
+                if (enviouFast) { clearInterval(t); resolve(); }
+              }, 150);
+              setTimeout(() => { clearInterval(t); resolve(); }, 3500);
+            })
+          ]);
+        }
+
+        document.getElementById('form-area').style.display = 'none';
+        document.getElementById('ok-area').style.display = 'block';
+        document.getElementById('ok-msg').textContent =
+          `Boa, ${nome}! Seu nome já entrou na roleta. Agora olhe para o telão!`;
+      });
+    }
+
+    // =========================================================================
+    // 5. MODO TELÃO (PROJETOR — 100% DISFARÇADO ATÉ VOCÊ REVELAR)
+    // =========================================================================
+    let registros = [];
+    let idsVistos = new Set();
+    let modoRevelado = false;
+    let salaAtual = '';
+    let telaoClients = [];
+    let ntfyWs = null;
+    const estadosCanal = { EMQX: 'connecting', HiveMQ: 'connecting', Port443: 'connecting' };
+    let toastTimer = null;
+
+    function atualizarHudStatus() {
+      const icon = st => st === 'online' ? '🟢' : (st === 'connecting' ? '🟡' : '🔴');
+      const txt = `${icon(estadosCanal.EMQX)} EMQX  ${icon(estadosCanal.HiveMQ)} HiveMQ  ${icon(estadosCanal.Port443)} P443`;
+      document.getElementById('hud-status').textContent = txt;
+    }
+
+    function iniciarTelao() {
+      document.getElementById('view-telao').style.display = 'flex';
+      if (window.location.protocol === 'file:') {
+        document.getElementById('local-warn').style.display = 'block';
+      }
+
+      salaAtual = sessionStorage.getItem('sorteio_sala_id') || gerarIdSala();
+      sessionStorage.setItem('sorteio_sala_id', salaAtual);
+
+      configurarQR();
+      renderizarTabela();
+      conectarCanaisTelao();
+
+      // Duplo clique no canto superior direito também abre o HUD secreto
+      document.getElementById('secret-corner').addEventListener('dblclick', toggleHudSecreto);
+
+      // Atalhos de teclado invisíveis para o apresentador
+      document.addEventListener('keydown', (e) => {
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+        const k = e.key.toLowerCase();
+        if (k === 'r') {
+          if (modoRevelado) mostrarTelaSorteio(); else revelarAgora();
+        } else if (k === 'enter' && !modoRevelado) {
+          iniciarSuspenseERevelar();
+        } else if (k === 't') {
+          simularTeste();
+        } else if (k === 'l') {
+          novaSala();
+        } else if (k === 'h') {
+          toggleHudSecreto();
+        }
+      });
+    }
+
+    function toggleHudSecreto() {
+      const hud = document.getElementById('hud-secreto');
+      hud.style.display = hud.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function configurarQR() {
+      const base = window.location.protocol === 'file:'
+        ? 'https://seu-link-aqui.netlify.app/'
+        : `${window.location.origin}${window.location.pathname}`;
+      const linkAluno = `${base}?s=${encodeURIComponent(salaAtual)}`;
+      desenharQRNoCanvas(document.getElementById('qr-canvas'), linkAluno);
+    }
+
+    function conectarCanaisTelao() {
+      telaoClients.forEach(c => c.close());
+      telaoClients = [];
+      if (ntfyWs) { try { ntfyWs.close(); } catch (e) {} ntfyWs = null; }
+
+      const mqttTopic = 'sorteio/palestra/' + salaAtual;
+      const onMsg = (raw) => {
+        try { adicionarRegistro(JSON.parse(raw)); } catch (e) {}
+      };
+      const onState = (name, st) => {
+        estadosCanal[name] = st;
+        atualizarHudStatus();
+      };
+
+      // Canais principais ultra-rápidos (MQTT over WSS)
+      telaoClients = BROKERS.map(b => new FastMqttClient(b.name, b.url, mqttTopic, onMsg, onState));
+
+      // Canal secundário Porta 443 (ntfy.sh WebSocket — passa em qualquer firewall escolar)
+      conectarNtfyWs(salaAtual);
+    }
+
+    function conectarNtfyWs(sala) {
+      estadosCanal.Port443 = 'connecting';
+      atualizarHudStatus();
+      try {
+        const ws = new WebSocket(`wss://ntfy.sh/sorteio_${encodeURIComponent(sala)}/ws?since=1h`);
+        ntfyWs = ws;
+        ws.onopen = () => { estadosCanal.Port443 = 'online'; atualizarHudStatus(); };
+        ws.onmessage = (ev) => {
+          try {
+            const env = JSON.parse(ev.data);
+            if (env.event === 'message' && env.message) {
+              adicionarRegistro(JSON.parse(env.message));
+            }
+          } catch (e) {}
+        };
+        ws.onclose = () => {
+          estadosCanal.Port443 = 'offline'; atualizarHudStatus();
+          if (salaAtual === sala) setTimeout(() => conectarNtfyWs(sala), 4000);
+        };
+        ws.onerror = () => { estadosCanal.Port443 = 'error'; atualizarHudStatus(); };
+      } catch (e) {}
+    }
+
+    function adicionarRegistro(item) {
+      if (!item || !item.nome) return;
+      const chave = item.id || `${item.nome}-${item.horario}`;
+      if (idsVistos.has(chave)) return;
+      idsVistos.add(chave);
+      registros.push(item);
+      renderizarTabela();
+
+      // Feedback visual sutil na contagem da roleta
+      const box = document.getElementById('counter-box');
+      const toast = document.getElementById('join-toast');
+      box.classList.add('pulse');
+      toast.classList.add('show');
+      setTimeout(() => box.classList.remove('pulse'), 280);
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+    }
+
+    function iniciarSuspenseERevelar() {
+      const overlay = document.getElementById('overlay-roleta');
+      const nameEl = document.getElementById('roleta-nome');
+      overlay.style.display = 'flex';
+
+      const pool = registros.length > 0
+        ? registros.map(r => r.nome)
+        : ['Lucas', 'AnaClara', 'Pedro_Gamer', 'Bia_Roblox', 'Matheus07'];
+
+      let ticks = 0;
+      const timer = setInterval(() => {
+        nameEl.textContent = pool[Math.floor(Math.random() * pool.length)];
+        ticks++;
+        if (ticks >= 22) {
+          clearInterval(timer);
+          overlay.style.display = 'none';
+          revelarAgora();
+        }
+      }, 95);
+    }
+
+    function revelarAgora() {
+      modoRevelado = true;
+      document.getElementById('modo-sorteio').style.display = 'none';
+      document.getElementById('modo-revelacao').style.display = 'flex';
+      document.getElementById('topbar').classList.add('alert-mode');
+    }
+
+    function mostrarTelaSorteio() {
+      modoRevelado = false;
+      document.getElementById('modo-revelacao').style.display = 'none';
+      document.getElementById('modo-sorteio').style.display = 'grid';
+      document.getElementById('topbar').classList.remove('alert-mode');
+    }
+
+    function renderizarTabela() {
+      document.getElementById('contador').textContent = registros.length;
+      document.getElementById('contador-ataque').textContent = registros.length;
+      const tbody = document.getElementById('tabela-corpo');
+      tbody.innerHTML = '';
+
+      if (registros.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.colSpan = 7;
+        td.style.textAlign = 'center';
+        td.style.color = '#64748b';
+        td.textContent = 'Nenhum participante registrado ainda...';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      registros.slice().reverse().forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        const cols = [
+          { txt: String(registros.length - idx), cls: '' },
+          { txt: String(item.nome || '').slice(0, 40), cls: 'nome' },
+          { txt: String(item.premio || ''), cls: '' },
+          { txt: String(item.dispositivo || 'N/A'), cls: 'disp' },
+          { txt: String(item.navegador || 'N/A'), cls: '' },
+          { txt: String(item.tela || 'N/A'), cls: '' },
+          { txt: String(item.horario || ''), cls: '' }
+        ];
+        cols.forEach(c => {
+          const td = document.createElement('td');
+          td.textContent = c.txt; // Seguro contra XSS
+          if (c.cls) td.className = c.cls;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function sortearNomeReal() {
+      if (!registros.length) return alert('Ninguém entrou na lista ainda!');
+      const escolhido = registros[Math.floor(Math.random() * registros.length)];
+      const box = document.getElementById('winner-box');
+      box.style.display = 'block';
+      box.textContent = `🎉 SORTEADO DA VEZ: ${escolhido.nome} (${escolhido.dispositivo}) — Prêmio: ${escolhido.premio}`;
+    }
+
+    function simularTeste() {
+      const exemplos = [
+        { nome: 'Pedro_Gamer', premio: 'Discord Nitro (1 Ano)', disp: 'Android (Samsung)', nav: 'Chrome', tela: '360x800' },
+        { nome: 'AnaClara', premio: '10.000 Robux', disp: 'iPhone (iOS)', nav: 'Safari', tela: '390x844' },
+        { nome: 'Matheus07', premio: 'Gift Card Steam / Play', disp: 'Android (Xiaomi)', nav: 'Chrome', tela: '393x851' },
+        { nome: 'Bia_Roblox', premio: '10.000 Robux', disp: 'Android (Motorola)', nav: 'Chrome', tela: '412x915' },
+        { nome: 'RafaYT', premio: 'Discord Nitro (1 Ano)', disp: 'iPhone (iOS)', nav: 'Safari', tela: '430x932' }
+      ];
+      const e = exemplos[Math.floor(Math.random() * exemplos.length)];
+      adicionarRegistro({
+        id: 'sim-' + Math.random().toString(36).slice(2),
+        nome: e.nome,
+        premio: e.premio,
+        dispositivo: e.disp,
+        navegador: e.nav,
+        tela: e.tela,
+        horario: horaAtual()
+      });
+    }
+
+    function novaSala() {
+      registros = [];
+      idsVistos.clear();
+      salaAtual = gerarIdSala();
+      sessionStorage.setItem('sorteio_sala_id', salaAtual);
+      document.getElementById('winner-box').style.display = 'none';
+      configurarQR();
+      renderizarTabela();
+      conectarCanaisTelao();
+    }
+
+    if (!isAluno) {
+      iniciarTelao();
+    }
+  </script>
+</body>
+</html>
