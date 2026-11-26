@@ -684,9 +684,6 @@
       }
 
       // Só abre WebSockets DEPOIS da página terminar 100% do carregamento (não trava a barrinha!)
-      window.addEventListener('load', () => {
-        setTimeout(iniciarConexaoAluno, 500);
-      });
 
       const form = document.getElementById('form-sorteio');
       const btn = document.getElementById('btn-enviar');
