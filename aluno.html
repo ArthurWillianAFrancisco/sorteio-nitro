@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1120">
+  <title>Participar do sorteio</title>
+  <style>
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle at top,#312e81 0%,#0b1120 72%);color:#f8fafc}
+    .card{width:100%;max-width:420px;background:#131c31;border:1.5px solid #5865F2;border-radius:20px;padding:28px 24px;box-shadow:0 20px 50px #0008;text-align:center}
+    .badge{display:inline-block;background:linear-gradient(90deg,#5865F2,#a855f7);font-size:12px;font-weight:800;letter-spacing:1px;padding:6px 14px;border-radius:999px;margin-bottom:14px}
+    h1{margin:4px 0 8px;font-size:26px;line-height:1.2}p.sub{color:#cbd5e1;font-size:14.5px;margin:0 0 22px;line-height:1.45}
+    label{display:block;text-align:left;font-size:13px;color:#94a3b8;margin:12px 0 6px;font-weight:600}
+    input,select{width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid #273654;background:#070b14;color:#f8fafc;font-size:16px;outline:none}
+    input:focus,select:focus{border-color:#00e5ff}
+    button{width:100%;margin-top:20px;padding:14px;border:0;border-radius:12px;background:linear-gradient(90deg,#5865F2,#00e5ff);color:#070b14;font-size:16px;font-weight:800;cursor:pointer}
+    button:disabled{opacity:.65;cursor:wait}.note{margin-top:16px;font-size:12px;color:#94a3b8}.error{color:#fda4af;font-size:13px;margin-top:12px;display:none}
+    .ok{display:none;padding:12px 4px}.ok-icon{font-size:54px;margin-bottom:8px}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <section id="form-area">
+      <div class="badge">🎁 SORTEIO AO VIVO</div>
+      <h1>Discord Nitro Liberado!</h1>
+      <p class="sub">Coloque seu <strong>primeiro nome ou apelido</strong> para entrar na roleta do sorteio de hoje.</p>
+      <form id="form-sorteio">
+        <label for="nome">Seu nome ou apelido</label>
+        <input id="nome" name="nome" type="text" maxlength="40" placeholder="Ex: Lucas, Bia, GamerBR..." required autocomplete="off">
+        <label for="premio">Se ganhar, qual prêmio você prefere?</label>
+        <select id="premio" name="premio">
+          <option value="Discord Nitro (1 Ano)">Discord Nitro (1 Ano)</option>
+          <option value="10.000 Robux">10.000 Robux</option>
+          <option value="Gift Card Steam / Play">Gift Card Steam / Play</option>
+        </select>
+        <button type="submit" id="btn-enviar">QUERO PARTICIPAR!</button>
+        <div class="error" id="erro" role="alert">Não foi possível enviar sua inscrição. Verifique a conexão e tente novamente.</div>
+      </form>
+      <div class="note">Válido apenas durante o evento de hoje.</div>
+    </section>
+    <section class="ok" id="ok-area" aria-live="polite">
+      <div class="ok-icon">🎟️</div>
+      <h1 style="color:#10b981">Inscrição Confirmada!</h1>
+      <p class="sub" id="ok-msg">Seu nome já entrou na roleta. Agora fique de olho no telão!</p>
+    </section>
+  </main>
+<script>
+(() => {
+  const sala = new URLSearchParams(location.search).get('s') || new URLSearchParams(location.search).get('sala');
+  const form = document.getElementById('form-sorteio');
+  const btn = document.getElementById('btn-enviar');
+  const erro = document.getElementById('erro');
+  if (!sala) {
+    form.style.display = 'none';
+    erro.style.display = 'block';
+    erro.textContent = 'Link de participação inválido. Peça para escanear novamente o QR Code do telão.';
+    return;
+  }
+  function dispositivo() {
+    const ua = navigator.userAgent.toLowerCase();
+    if (ua.includes('iphone')) return 'iPhone (iOS)';
+    if (ua.includes('ipad')) return 'iPad (iPadOS)';
+    if (ua.includes('android')) {
+      if (ua.includes('samsung') || ua.includes('sm-')) return 'Android (Samsung)';
+      if (ua.includes('moto ') || ua.includes('motorola')) return 'Android (Motorola)';
+      if (ua.includes('xiaomi') || ua.includes('redmi') || ua.includes('poco')) return 'Android (Xiaomi)';
+      return 'Android';
+    }
+    if (ua.includes('windows')) return 'PC (Windows)';
+    if (ua.includes('macintosh') || ua.includes('mac os')) return 'Mac (macOS)';
+    if (ua.includes('linux')) return 'PC (Linux)';
+    return 'Celular / Web';
+  }
+  function navegador() {
+    const ua = navigator.userAgent.toLowerCase();
+    if (ua.includes('instagram')) return 'App Instagram';
+    if (ua.includes('edg/')) return 'Edge';
+    if (ua.includes('opr/') || ua.includes('opera')) return 'Opera';
+    if (ua.includes('firefox') || ua.includes('fxios')) return 'Firefox';
+    if (ua.includes('chrome') || ua.includes('crios')) return 'Chrome';
+    if (ua.includes('safari')) return 'Safari';
+    return 'Navegador Web';
+  }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nome = document.getElementById('nome').value.trim().slice(0, 40);
+    if (!nome) return;
+    btn.disabled = true;
+    btn.textContent = 'ENVIANDO...';
+    erro.style.display = 'none';
+    const payload = {
+      id: Math.random().toString(36).slice(2) + Date.now(),
+      nome,
+      premio: document.getElementById('premio').value,
+      dispositivo: dispositivo(),
+      navegador: navegador(),
+      tela: `${screen.width}x${screen.height}`,
+      horario: new Date().toLocaleTimeString('pt-BR', {hour12:false})
+    };
+    try {
+      const resposta = await fetch('https://ntfy.sh/sorteio_' + encodeURIComponent(sala), {
+        method: 'POST',
+        headers: {'Content-Type':'text/plain; charset=utf-8'},
+        body: JSON.stringify(payload)
+      });
+      if (!resposta.ok) throw new Error('Falha no envio');
+      document.getElementById('form-area').style.display = 'none';
+      document.getElementById('ok-area').style.display = 'block';
+      document.getElementById('ok-msg').textContent = `Boa, ${nome}! Seu nome já entrou na roleta. Agora olhe para o telão!`;
+    } catch (_) {
+      erro.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'TENTAR NOVAMENTE';
+    }
+  });
+})();
+</script>
+</body>
+</html>
